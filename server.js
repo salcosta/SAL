@@ -26,8 +26,6 @@ router.post('/:collection', function(req, res) {
 
   
     if( collections[collection] === undefined ){
-    	console.log("================")
-    	console.log(dimensions)
     	createCollection(collection, dimensions);
     }
 
@@ -46,9 +44,8 @@ router.delete('/:collection',function(req,res){
 
 router.get('/:collection', function(req, res) {
     var collection = req.params.collection;
-    var text = req.body.text;
-    console.log(text)
-
+    var text = req.query.text;
+    
     res.send( classifyText(collection, text));
     
 });
@@ -71,6 +68,7 @@ function deleteCollection(collection){
 }
 
 function classifyText(collection, text){
+    console.log(text)
 	var result = {};
 
 	_.each(collections[collection].dimensions, function(classifier, key){
@@ -92,24 +90,24 @@ function createCollection(collection, dimensions){
 		dimensions : []
 	};
 
-	_.each(dimensions, function(dimension){
+	_.each(dimensions, function(dimension, index){
 		console.log(dimension)
 
-		collections[collection].dimensions[dimension.name] = new natural.BayesClassifier();
-		collectionList[collection].dimensions.push(dimension.name.toString());
+		collections[collection].dimensions[index] = new natural.BayesClassifier();
+		collectionList[collection].dimensions.push(index);
 	});
 
 	saveConfig();
 }
 
 function trainDimensions(collection, dimensions, text){
-	_.each(dimensions, function(dimension){
-		collections[collection].dimensions[dimension.name].addDocument(text, dimension.value );
+	_.each(dimensions, function(dimension,index){
+		collections[collection].dimensions[index].addDocument(text, dimension );
 	});	
 
-	_.each(dimensions, function(dimension){
-		collections[collection].dimensions[dimension.name].train();
-		collections[collection].dimensions[dimension.name].save( collection + '.' + dimension.name + '.json', function(err, classifier) { } );
+	_.each(dimensions, function(dimension,index){
+		collections[collection].dimensions[index].train();
+		collections[collection].dimensions[index].save(collection + '.' + index + '.json', function(err, classifier) { } );
     
 	});	
 	
@@ -126,9 +124,9 @@ function loadCollections(){
 	_.each(collectionList, function(collection, key, list){
 		collections[key] = { name: key, dimensions : {} };
 
-		_.each(collection.dimensions, function(dimension){
-			console.log(key + '.' + dimension + '.json')
+		_.each(collection.dimensions, function(dimension, index){
 			natural.BayesClassifier.load( key + '.' + dimension + '.json', null, function(err, classifier) { 
+                console.log("Loading " + key + " " + dimension);
 				collections[key].dimensions[dimension] = classifier;
 			} );
 

@@ -1,0 +1,1 @@
+{"classifier":{"classFeatures":{"urgent":{"0":2,"1":2,"2":2,"3":2}},"classTotals":{"urgent":3},"totalExamples":3,"smoothing":1},"docs":[{"label":"urgent","text":["bui","qs"]},{"label":"urgent","text":["long","qqqq"]}],"features":{"bui":1,"qs":1,"long":1,"qqqq":1},"stemmer":{},"lastAdded":2,"events":{"domain":null,"_events":{},"_maxListeners":10}}
